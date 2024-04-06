@@ -39,65 +39,73 @@ def streamlit_app(llm):
             st.session_state.tasks = []
 
         def add_agent():
-            st.session_state.agents.append({'role': '', 'goal': '', 'backstory': ''})
+            st.session_state.agents.append({'role': '', 'goal': '', 'backstory': '', 'tools': ''})
 
         def add_task():
-            st.session_state.tasks.append({'description': '', 'expected_output': ''})
-    
+            st.session_state.tasks.append({'agent':'', 'description': '', 'expected_output': ''})
 
-        # Buttons to add agents and tasks
-        st.button("Add Agent", on_click=add_agent)
-        st.button("Add Task", on_click=add_task)
+        with st.expander("Agents"):    
 
-        # Dynamically create input fields for each agent
-        for i, _ in enumerate(st.session_state.agents):
-            with st.container():
-                st.write(f"Agent {i+1}")
-                st.session_state.agents[i]['role'] = st.text_input(
-                    f"Role {i+1}", 
-                    value=st.session_state.agents[i].get('role', ''), 
-                    key=f"role_{i}"
-                )
-                st.session_state.agents[i]['goal'] = st.text_input(
-                    f"Goal {i+1}", 
-                    value=st.session_state.agents[i].get('goal', ''), 
-                    key=f"goal_{i}"
-                )
-                st.session_state.agents[i]['backstory'] = st.text_area(
-                    f"Backstory {i+1}", 
-                    value=st.session_state.agents[i].get('backstory', ''), 
-                    key=f"backstory_{i}"
-                )
+            st.button("Add Agent", on_click=add_agent)
 
-        # Dynamically create input fields for tasks, including an agent dropdown
-        for i, task in enumerate(st.session_state.tasks):
-            with st.container():
-                st.write(f"Task {i+1}")
-                
-                # Create a list of agent roles for the dropdown and find the index of the current task's agent
-                agent_options = [agent['role'] for agent in st.session_state.agents]
-                current_agent_index = agent_options.index(task['agent']) if task['agent'] in agent_options else 0
-                
-                # Dropdown for selecting an agent for the task
-                selected_agent = st.selectbox(
-                    f"Select Agent for Task {i+1}", 
-                    agent_options, 
-                    index=current_agent_index, 
-                    key=f"agent_select_{i}"
-                )
-                
-                # Set the selected agent and update task details with the current values or empty strings if not present
-                task['agent'] = selected_agent
-                task['description'] = st.text_input(
-                    f"Description {i+1}", 
-                    value=task.get('description', ''), 
-                    key=f"description_{i}"
-                )
-                task['expected_output'] = st.text_input(
-                    f"Expected Output {i+1}", 
-                    value=task.get('expected_output', ''), 
-                    key=f"expected_output_{i}"
-                )
+            # Dynamically create input fields for each agent
+            for i, _ in enumerate(st.session_state.agents):
+                with st.container():
+                    st.write(f"Agent {i+1}")
+                    st.session_state.agents[i]['role'] = st.text_input(
+                        f"Role {i+1}", 
+                        value=st.session_state.agents[i].get('role', ''), 
+                        key=f"role_{i}"
+                    )
+                    st.session_state.agents[i]['goal'] = st.text_input(
+                        f"Goal {i+1}", 
+                        value=st.session_state.agents[i].get('goal', ''), 
+                        key=f"goal_{i}"
+                    )
+                    st.session_state.agents[i]['backstory'] = st.text_area(
+                        f"Backstory {i+1}", 
+                        value=st.session_state.agents[i].get('backstory', ''), 
+                        key=f"backstory_{i}"
+                    )
+                    st.session_state.agents[i]['tools'] = st.text_input(
+                        f"Tools {i+1}", 
+                        value=st.session_state.agents[i].get('tools', ''), 
+                        key=f"tools_{i}"
+                    )                    
+
+        with st.expander("Tasks"):
+            st.button("Add Task", on_click=add_task)
+
+
+            # Dynamically create input fields for tasks, including an agent dropdown
+            for i, task in enumerate(st.session_state.tasks):
+                with st.container():
+                    st.write(f"Task {i+1}")
+                    
+                    # Create a list of agent roles for the dropdown and find the index of the current task's agent
+                    agent_options = [agent['role'] for agent in st.session_state.agents]
+                    current_agent_index = agent_options.index(task['agent']) if task['agent'] in agent_options else 0
+                    
+                    # Dropdown for selecting an agent for the task
+                    selected_agent = st.selectbox(
+                        f"Select Agent for Task {i+1}", 
+                        agent_options, 
+                        index=current_agent_index, 
+                        key=f"agent_select_{i}"
+                    )
+                    
+                    # Set the selected agent and update task details with the current values or empty strings if not present
+                    task['agent'] = selected_agent
+                    task['description'] = st.text_input(
+                        f"Description {i+1}", 
+                        value=task.get('description', ''), 
+                        key=f"description_{i}"
+                    )
+                    task['expected_output'] = st.text_input(
+                        f"Expected Output {i+1}", 
+                        value=task.get('expected_output', ''), 
+                        key=f"expected_output_{i}"
+                    )
     with tab_execution:
         # Submit button to process the inputs
         if st.button('Run Crew'):
