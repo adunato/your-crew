@@ -1,3 +1,4 @@
 
 api_key.gitignore
 __pycache__/streamlit.cpython-310.pyc
+*.pyc
