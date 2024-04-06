@@ -1,8 +1,4 @@
 {
-    "test": {
-        "agents": [],
-        "tasks": []
-    },
     "footwear_business_plan": {
         "agents": [
             {

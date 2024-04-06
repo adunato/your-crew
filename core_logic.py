@@ -84,6 +84,19 @@ def load_session(template_name):
             return data.get(template_name, {"agents": [], "tasks": []})
     return {"agents": [], "tasks": []}
 
+def delete_session(template_name):
+    if os.path.exists(SESSIONS_FILE):
+        with open(SESSIONS_FILE, 'r') as file:
+            data = json.load(file)
+        
+        # Check if the template exists and delete it
+        if template_name in data:
+            del data[template_name]
+            
+            # Write the updated data back to the file
+            with open(SESSIONS_FILE, 'w') as file:
+                json.dump(data, file, indent=4)
+
 def list_templates():
     if os.path.exists(SESSIONS_FILE):
         with open(SESSIONS_FILE, "r") as file:

@@ -1,6 +1,6 @@
 import os
 import streamlit as st
-from core_logic import get_api_key, test_llm_connection, generate_llm, run_crew, save_session, load_session, list_templates
+from core_logic import get_api_key, test_llm_connection, generate_llm, run_crew, save_session, load_session, delete_session, list_templates
 
 # Assuming the rest of the provided code is available and functions are defined as before
 
@@ -8,9 +8,9 @@ def streamlit_app(llm):
 
     st.title("Your Crew")
 
-    tab1, tab2, tab3 = st.tabs(["Crew Execution", "Session", "Configuration"])
+    tab_execution, tab_session, tab_configuration = st.tabs(["Crew Execution", "Session", "Configuration"])
 
-    with tab2:
+    with tab_session:
 
         template_name = st.text_input("Template Name")
         if st.button("Save Current Session"):
@@ -18,13 +18,19 @@ def streamlit_app(llm):
             st.success(f"Session '{template_name}' saved.")
 
         template_to_load = st.selectbox("Load Template", options=list_templates())
-        if st.button("Load Selected Template"):
+        if st.button("Load Session"):
             session_data = load_session(template_to_load)
             st.session_state.agents = session_data["agents"]
             st.session_state.tasks = session_data["tasks"]
             st.success(f"Loaded template: {template_to_load}")
 
-    with tab3:
+        if st.button("🗑️ Delete Session"):
+            delete_session(template_to_load)
+            st.success(f"Template '{template_to_load}' deleted.")
+            # Refresh the page to update the dropdown
+            st.experimental_rerun()
+
+    with tab_configuration:
 
         # Initialize session state for agents and tasks
         if 'agents' not in st.session_state:
@@ -92,7 +98,7 @@ def streamlit_app(llm):
                     value=task.get('expected_output', ''), 
                     key=f"expected_output_{i}"
                 )
-    with tab1:
+    with tab_execution:
         # Submit button to process the inputs
         if st.button('Run Crew'):
             st.write("Running Crew with provided details...")
