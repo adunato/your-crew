@@ -4,6 +4,7 @@ import os
 from crewai import Agent, Task, Process, Crew
 from langchain_anthropic import ChatAnthropic
 from langchain_core.prompts import ChatPromptTemplate
+from crewai_tool_mapping import map_tools
 
 
 def get_api_key(file_path):
@@ -37,6 +38,7 @@ def run_crew(llm, agent_details, task_details):
     agents = [Agent(role=agent['role'],
                     goal=agent['goal'],
                     backstory=agent['backstory'],
+                    tools = map_tools(agent['tools']),
                     verbose=True,
                     allow_delegation=True,
                     llm=llm) for agent in agent_details]
