@@ -33,6 +33,22 @@ def generate_llm(api):
     llm = ChatAnthropic(model="claude-3-haiku-20240307", anthropic_api_key=api)
     return llm
 
+import sys
+
+class OutputRedirector(object):
+    def __init__(self, filepath):
+        self.filepath = filepath
+        self.old_stdout = sys.stdout
+
+    def __enter__(self):
+        self.file = open(self.filepath, 'w')
+        sys.stdout = self.file
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        sys.stdout = self.old_stdout
+        if self.file:
+            self.file.close()
+
 def run_crew(llm, agent_details, task_details):
     # Create Agent objects dynamically from agent_details
     agents = [Agent(role=agent['role'],
@@ -40,7 +56,7 @@ def run_crew(llm, agent_details, task_details):
                     backstory=agent['backstory'],
                     tools = map_tools(agent['tools']),
                     verbose=True,
-                    allow_delegation=True,
+                    allow_delegation=agent['allow_delegation'],
                     llm=llm) for agent in agent_details]
     
     # Match agents to tasks based on role
@@ -55,10 +71,10 @@ def run_crew(llm, agent_details, task_details):
                               expected_output=task_detail['expected_output']))
     
     # Run the crew with the dynamically created agents and tasks
-    crew = Crew(agents=agents, tasks=tasks, verbose=2, process=Process.sequential)
-    result = crew.kickoff()
-    
-    return result
+    with OutputRedirector('output_file.txt'):
+        crew = Crew(agents=agents, tasks=tasks, verbose=2, process=Process.sequential)
+        result = crew.kickoff()    
+        return result
 
 SESSIONS_FILE = "sessions.json"
 

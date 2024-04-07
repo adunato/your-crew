@@ -5,7 +5,7 @@ from crewai_tools import SerperDevTool, FileReadTool, WebsiteSearchTool
 tool_mapping = {
     'SerperDevTool': SerperDevTool,
     'FileReadTool': FileReadTool,
-    'WebsiteSearchTool' : WebsiteSearchTool
+    # 'WebsiteSearchTool' : WebsiteSearchTool
     # Add more tools as necessary
 }
 

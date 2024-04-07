@@ -32,6 +32,16 @@ def streamlit_app(llm):
 
     with tab_configuration:
 
+        if st.button("Test Configuration"):
+            claudeapi = os.environ.get("CLAUDE3_API_KEY")
+            print(f"CLAUDE3_API_KEY: {claudeapi}")
+            serperapi = os.environ.get("SERPER_API_KEY")
+            print(f"SERPER_API_KEY: {serperapi}")
+            if claudeapi != None and serperapi != None:
+                st.success(f"API keys found")
+            else:
+                st.failure(f"API keys not found")
+
         # Initialize session state for agents and tasks
         if 'agents' not in st.session_state:
             st.session_state.agents = []
@@ -71,7 +81,8 @@ def streamlit_app(llm):
                         f"Tools {i+1}", 
                         value=st.session_state.agents[i].get('tools', ''), 
                         key=f"tools_{i}"
-                    )                    
+                    )
+                    st.session_state.agents[i]['allow_delegation'] = st.checkbox("Allow Delegation", value=st.session_state.agents[i].get('allow_delegation', False), key=f"allow_delegation_{i}") 
 
         with st.expander("Tasks"):
             st.button("Add Task", on_click=add_task)
@@ -96,7 +107,7 @@ def streamlit_app(llm):
                     
                     # Set the selected agent and update task details with the current values or empty strings if not present
                     task['agent'] = selected_agent
-                    task['description'] = st.text_input(
+                    task['description'] = st.text_area(
                         f"Description {i+1}", 
                         value=task.get('description', ''), 
                         key=f"description_{i}"
